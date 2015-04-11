@@ -1,5 +1,6 @@
 #TODO AT END: rename to assignment1_p1.py
 
+
 def is_complete(board):
   if board == []:
     return False
