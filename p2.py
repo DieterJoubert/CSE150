@@ -81,7 +81,7 @@ def bfs(board):
   tree = Queue.Queue()
   tree.put( ([],initial) )
 
-  while True:
+  while not tree.empty():
     (path,get_board) = tree.get()
 
     #check if board is in finished position, in which case print path to get there
