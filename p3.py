@@ -50,7 +50,7 @@ def main():
     print ""
   
   else:
-    bfs(board)
+    dfs(board)
 
 def getzero(board):
   for y in range(len(board)):
@@ -69,7 +69,7 @@ def print_board(board):
     print string
 
 #breadth first search of the board for a solution
-def bfs(board):
+def dfs(board):
   direction = [ ('U',(-1, 0)), ('R',(0, 1)), ('D',(1, 0)), ('L',(0, -1))]
 
   initial = board
@@ -77,18 +77,18 @@ def bfs(board):
   explored.append(list(board))
 
   #use a queue to BFS, put path of moves so far and board itself in queue
-  tree = Queue.Queue()
-  tree.put( ([],initial) )
+  tree = Queue.LifoQueue()
+  tree.put( ([],initial,0) )
 
   while True:
-    (path,get_board) = tree.get()
+    (path,get_board,depth) = tree.get()
 
     #check if board is in finished position, in which case print path to get there
     if is_complete(get_board):
       print "".join(path)
       break
 
-    else:
+    elif depth < 5:
       for (name, (y_delta,x_delta)) in direction:
 
         curr_board = copy.deepcopy(get_board)
@@ -107,8 +107,7 @@ def bfs(board):
           if new_board not in explored:
             explored.append(list(curr_board))
             new_path = path + [name]
-            tree.put( (list(new_path), list(new_board)) )
-
+            tree.put( (list(new_path), list(new_board), depth+1) )
 
 if __name__ == '__main__':
   main()
