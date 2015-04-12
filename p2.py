@@ -13,6 +13,7 @@ def is_complete(board):
         return False
   return True
 
+
 #check the number of inversions, if odd, not solvable
 def is_solvable(board):
   inv_count = 0
