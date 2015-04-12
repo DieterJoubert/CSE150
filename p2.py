@@ -52,9 +52,41 @@ def main():
   else:
     bfs(board)
 
+def getzero(board):
+  for y in range(len(board)):
+    for x in range(len(board[0])):
+      if board[y][x] == 0
+        return (y,x)
+
 #breadth first search of the board for a solution
-def bfs():
-  
+def bfs(board):
+  direction = {'N': (-1, 0), 'E': (0, 1), 'S': (1, 0), 'W': (0, -1)}
+
+  initial = board
+  explored = []
+  explored.append(board)
+
+  #use a queue to BFS, put path of moves so far and board itself in queue
+  tree = Queue.Queue()
+  tree.put( ([],initial) )
+
+  while tree.not_empty:
+    (path,curr_board) = tree.get()
+
+    #check if board is in finished position, in which case print path to get there
+    if is_complete(curr_board):
+      print path
+      break
+
+    else:
+      zero = getzero(curr_board)
+
+
+
+
+
+
+
   
 
 
