@@ -43,11 +43,11 @@ def main():
   board = [[int(n.strip()) for n in line.split(',')] for line in sys.stdin.readlines()] 
 
   #check if board can't be solved, in which case end main, print UNSOLVABLE
-  if not is_solvable(board):
-    print("UNSOLVABLE")
+  #if not is_solvable(board):
+  #  print("UNSOLVABLE")
 
   #check if board finished, in which case don't print anything, end main
-  elif is_complete(board):
+  if is_complete(board):
     print ""
   
   else:
@@ -87,7 +87,7 @@ def bfs(board):
     #check if board is in finished position, in which case print path to get there
     if is_complete(get_board):
       print "".join(path)
-      break
+      return
 
     else:
       for (name, (y_delta,x_delta)) in direction:
@@ -97,7 +97,7 @@ def bfs(board):
         (y_max, x_max) = lengthwidth(curr_board)
 
         #check if zero can be moved in this direction (won't go out of bounds)
-        if (y_zero + y_delta <= y_max) and (x_zero + x_delta <= x_max):
+        if (0 <= y_zero + y_delta <= y_max) and (0 <= x_zero + x_delta <= x_max):
 
           #switch zero with element in that direction
           new_board = copy.deepcopy(curr_board)
@@ -109,6 +109,9 @@ def bfs(board):
             explored.append(list(curr_board))
             new_path = path + [name]
             tree.put( (list(new_path), list(new_board)) )
+
+  print "UNSOLVABLE"
+  return
 
 
 if __name__ == '__main__':

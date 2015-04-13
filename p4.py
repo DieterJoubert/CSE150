@@ -42,11 +42,11 @@ def main():
   board = [[int(n.strip()) for n in line.split(',')] for line in sys.stdin.readlines()] 
 
   #check if board can't be solved, in which case end main, print UNSOLVABLE
-  if not is_solvable(board):
-    print("UNSOLVABLE")
+  #if not is_solvable(board):
+  # print("UNSOLVABLE")
 
   #check if board finished, in which case don't print anything, end main
-  elif is_complete(board):
+  if is_complete(board):
     print ""
   
   else:
@@ -58,7 +58,7 @@ def getzero(board):
       if board[y][x] == 0:
         return (y,x)
 
-def lengthwidth(board):
+def yxmax(board):
   return (len(board)-1, len(board[0])-1)
 
 def print_board(board):
@@ -96,10 +96,10 @@ def iterative_deepening_dfs(board):
 
           curr_board = copy.deepcopy(get_board)
           (y_zero, x_zero) = getzero(curr_board)
-          (y_max, x_max) = lengthwidth(curr_board)
+          (y_max, x_max) = yxmax(curr_board)
 
           #check if zero can be moved in this direction (won't go out of bounds)
-          if (y_zero + y_delta <= y_max) and (x_zero + x_delta <= x_max):
+          if (0 <= y_zero + y_delta <= y_max) and (0 <= x_zero + x_delta <= x_max):
 
             #switch zero with element in that direction
             new_board = copy.deepcopy(curr_board)
