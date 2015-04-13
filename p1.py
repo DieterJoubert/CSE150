@@ -5,8 +5,8 @@ def is_complete(board):
   if board == []:
     return False
   last = -1
-  for lst in board:
-    for i in lst:
+  for row in board:
+    for i in row:
       if i == last+1:
         last = i
       else:
