@@ -76,7 +76,7 @@ def dfs(board):
   explored = []
   explored.append(list(board))
 
-  #use a queue to BFS, put path of moves so far and board itself in queue
+  #use a LIFO queue to DFS, put path of moves so far and board itself in queue
   tree = Queue.LifoQueue()
   tree.put( ([],initial,0) )
 
