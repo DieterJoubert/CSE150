@@ -59,7 +59,7 @@ def getzero(board):
       if board[y][x] == 0:
         return (y,x)
 
-def lengthwidth(board):
+def yxmax(board):
   return (len(board)-1, len(board[0])-1)
 
 def print_board(board):
@@ -94,7 +94,7 @@ def bfs(board):
 
         curr_board = copy.deepcopy(get_board)
         (y_zero, x_zero) = getzero(curr_board)
-        (y_max, x_max) = lengthwidth(curr_board)
+        (y_max, x_max) = yxmax(curr_board)
 
         #check if zero can be moved in this direction (won't go out of bounds)
         if (0 <= y_zero + y_delta <= y_max) and (0 <= x_zero + x_delta <= x_max):
