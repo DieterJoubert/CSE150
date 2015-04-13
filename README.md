@@ -5,15 +5,15 @@ python p1.py < input1.txt
 
 expected results:
 
-python p2.py < input1.txt
+python p2.py < input1.txt:
 UL
 
-python p2.py < input2.txt
+python p2.py < input2.txt:
 UNSOLVABLE
 
-python p2.py < input3.txt
+python p2.py < input3.txt:
 LDRUL
 
-python p3.py < input4.txt
+python p3.py < input4.txt:
 UNSOLVABLE
-#since solution path is greater than 5, solution can be found with p2
+(since solution path is greater than 5, solution can be found with p2)
