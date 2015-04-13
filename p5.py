@@ -5,53 +5,23 @@ def is_complete(board):
   if board == []:
     return False
   last = -1
-  for lst in board:
-    for i in lst:
+  for row in board:
+    for i in row:
       if i == last+1:
         last = i
       else:
         return False
   return True
 
-
-#check the number of inversions, if odd, not solvable
-def is_solvable(board):
-  inv_count = 0
-
-  nums = []
-  #for each position on the board
-  for y in range(len(board)):
-    for x in range(len(board[0])):
-      check = board[y][x]
-
-      if check != 0:
-        nums.append(check)
-
-  for i in range(len(nums)):
-    for j in range(i,len(nums)):
-      if nums[i] > nums[j]:
-        inv_count += 1
-
-  #if odd number of inversions, cannot be solved, else can be
-  if (inv_count % 2 == 1):
-    return False
-  else:
-    return True
-
 def main():
   import sys
   board = [[int(n.strip()) for n in line.split(',')] for line in sys.stdin.readlines()] 
 
-  #check if board can't be solved, in which case end main, print UNSOLVABLE
-  #if not is_solvable(board):
-  #  print("UNSOLVABLE")
-
-  #check if board finished, in which case don't print anything, end main
   if is_complete(board):
     print ""
   
   else:
-    bfs(board)
+    a_star(board)
 
 def getzero(board):
   for y in range(len(board)):
@@ -62,6 +32,9 @@ def getzero(board):
 def yxmax(board):
   return (len(board)-1, len(board[0])-1)
 
+def lengthwidth(board):
+  return (len(board), len(board[0]))  
+
 def print_board(board):
   for i in board:
     string = ""
@@ -69,20 +42,51 @@ def print_board(board):
       string += " " + str(j)
     print string
 
+def calc_h(check_board, solved_board):
+  h = 0
+
+  coordinates = {}
+
+  for y in range(len(check_board)):
+    for x in range(len(check_board[0])):
+      coordinates[check_board[y][x]] = (y, x)
+
+  for y_solved in range(len(solved_board)):
+    for x_solved in range(len(solved_board[0])):
+      value = solved_board[y_solved][x_solved]
+      (y_start, x_start) = coordinates[value]
+
+      h += abs(y_start - y_solved)
+      h += abs(x_start - x_solved)
+
+  return h
+
 #breadth first search of the board for a solution
-def bfs(board):
+def a_star(board):
   direction = [ ('U',(-1, 0)), ('D',(1, 0)), ('L',(0, -1)), ('R',(0, 1)) ]
 
   initial = board
   explored = []
   explored.append(list(board))
 
-  #use a queue to BFS, put path of moves so far and board itself in queue
-  tree = Queue.Queue()
-  tree.put( ([],initial) )
+  (length, width) = lengthwidth(board)
+  solved_board = []
+  index = 0
+  for i in range(length):
+    row = []
+    for j in range(width):
+      row.append(index)
+      index += 1
+    solved_board.append(row)
+
+  #use a LIFO queue to DFS, put path of moves so far and board itself in queue
+  tree = Queue.PriorityQueue()
+  h_start = calc_h(initial,solved_board)
+  tree.put( (0 + h_start, ([],initial,0)) )
 
   while not tree.empty():
-    (path,get_board) = tree.get()
+    (priority, (path,get_board,depth)) = tree.get()
+    print str(priority) + "  " + " ".join(path)
 
     #check if board is in finished position, in which case print path to get there
     if is_complete(get_board):
@@ -91,6 +95,7 @@ def bfs(board):
 
     else:
       for (name, (y_delta,x_delta)) in direction:
+        #TODO: doble check direction is ok
 
         curr_board = copy.deepcopy(get_board)
         (y_zero, x_zero) = getzero(curr_board)
@@ -108,11 +113,14 @@ def bfs(board):
           if new_board not in explored:
             explored.append(list(curr_board))
             new_path = path + [name]
-            tree.put( (list(new_path), list(new_board)) )
+            new_depth = depth + 1
+            f_value = new_depth + calc_h(new_board, solved_board)
+
+            tree.put( (f_value, (list(new_path), list(new_board), new_depth)) )
+
 
   print "UNSOLVABLE"
   return
-
 
 if __name__ == '__main__':
   main()

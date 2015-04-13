@@ -1,6 +1,5 @@
 #TODO AT END: rename to assignment1_p1.py
 
-
 def is_complete(board):
   if board == []:
     return False
@@ -20,4 +19,3 @@ def main():
 
 if __name__ == '__main__':
   main()
-
