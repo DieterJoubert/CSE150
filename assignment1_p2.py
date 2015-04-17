@@ -13,38 +13,9 @@ def is_complete(board):
         return False
   return True
 
-
-#check the number of inversions, if odd, not solvable
-def is_solvable(board):
-  inv_count = 0
-
-  nums = []
-  #for each position on the board
-  for y in range(len(board)):
-    for x in range(len(board[0])):
-      check = board[y][x]
-
-      if check != 0:
-        nums.append(check)
-
-  for i in range(len(nums)):
-    for j in range(i,len(nums)):
-      if nums[i] > nums[j]:
-        inv_count += 1
-
-  #if odd number of inversions, cannot be solved, else can be
-  if (inv_count % 2 == 1):
-    return False
-  else:
-    return True
-
 def main():
   import sys
   board = [[int(n.strip()) for n in line.split(',')] for line in sys.stdin.readlines()] 
-
-  #check if board can't be solved, in which case end main, print UNSOLVABLE
-  #if not is_solvable(board):
-  #  print("UNSOLVABLE")
 
   #check if board finished, in which case don't print anything, end main
   if is_complete(board):
