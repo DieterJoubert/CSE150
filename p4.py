@@ -51,8 +51,10 @@ def dfsiterative(board):
                 return
  
             elif depth < currdepth:
+                currboard = copy.deepcopy(getboard)
+                explored.append(list(currboard))
+                
                 for(direct, (ydelt, xdelt)) in direction:
-                    currboard = copy.deepcopy(getboard)
                     (yzero, xzero) = getzero(currboard)
                     (ymax, xmax) = yxmax(currboard)
  
@@ -63,7 +65,6 @@ def dfsiterative(board):
                         newboard[yzero][xzero] = temp
  
                         if newboard not in explored:
-                            explored.append(list(currboard))
                             newpath = path + [direct]
                             tree.put( (list(newpath), list(newboard), depth + 1) )
     print "UNSOLVABLE"
