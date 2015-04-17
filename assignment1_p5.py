@@ -74,6 +74,7 @@ def a_star(board):
   explored = []
   explored.append( hash_fn(board) )
 
+  #create solved board to check against for heuristic
   (length, width) = lengthwidth(board)
   solved_board = []
   index = 0
