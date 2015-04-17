@@ -53,6 +53,13 @@ def main():
   else:
     bfs(board)
 
+def hash_fn(board):
+  hash_string = ""
+  for i in board:
+    for j in i:
+      hash_string += str(j)
+  return hash(hash_string)
+
 def getzero(board):
   for y in range(len(board)):
     for x in range(len(board[0])):
@@ -75,7 +82,7 @@ def bfs(board):
 
   initial = board
   explored = []
-  explored.append(list(board))
+  explored.append(hash_fn(board))
 
   #use a queue to BFS, put path of moves so far and board itself in queue
   tree = Queue.Queue()
@@ -105,8 +112,8 @@ def bfs(board):
           new_board[y_zero+y_delta][x_zero+x_delta] = 0
           new_board[y_zero][x_zero] = temp
 
-          if new_board not in explored:
-            explored.append(list(curr_board))
+          if hash_fn(new_board) not in explored:
+            explored.append(hash_fn(curr_board))
             new_path = path + [name]
             tree.put( (list(new_path), list(new_board)) )
 
