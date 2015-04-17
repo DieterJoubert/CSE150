@@ -1,5 +1,6 @@
 import Queue
 import copy
+from heapq import *
 
 def is_complete(board):
   if board == []:
@@ -23,6 +24,13 @@ def main():
   else:
     a_star(board)
 
+def hash_fn(board):
+  hash_string = ""
+  for i in board:
+    for j in i:
+      hash_string += str(j)
+  return hash(hash_string)    
+
 def getzero(board):
   for y in range(len(board)):
     for x in range(len(board[0])):
@@ -34,13 +42,6 @@ def yxmax(board):
 
 def lengthwidth(board):
   return (len(board), len(board[0]))  
-
-def print_board(board):
-  for i in board:
-    string = ""
-    for j in i:
-      string += " " + str(j)
-    print string
 
 def calc_h(check_board, solved_board):
   h = 0
@@ -61,13 +62,29 @@ def calc_h(check_board, solved_board):
 
   return h
 
+def calc_hOLD(check_board, solved_board):
+  h = 0
+
+  coordinates = {}
+
+  for y in range(len(check_board)):
+    for x in range(len(check_board[0])):
+      if solved_board[y][x] != check_board[y][x]:
+        h += 1
+
+  return h
+
 #breadth first search of the board for a solution
 def a_star(board):
-  direction = [ ('U',(-1, 0)), ('D',(1, 0)), ('L',(0, -1)), ('R',(0, 1)) ]
+  directionOLD = [ ('U',(-1, 0)), ('D',(1, 0)), ('L',(0, -1)), ('R',(0, 1)) ]
+  direction = directionOLD
 
-  initial = board
+  weightOLD = {'U': 1, 'D': 2, 'L': 3, 'R': 4}
+  weight = {'U': 4, 'D': 3, 'L': 2, 'R': 1}
+
+  initial = copy.deepcopy(board)
   explored = []
-  explored.append(list(board))
+  explored.append( hash_fn(board) )
 
   (length, width) = lengthwidth(board)
   solved_board = []
@@ -79,14 +96,12 @@ def a_star(board):
       index += 1
     solved_board.append(row)
 
-  #use a LIFO queue to DFS, put path of moves so far and board itself in queue
-  tree = Queue.PriorityQueue()
+  tree = []
   h_start = calc_h(initial,solved_board)
-  tree.put( (0 + h_start, ([],initial,0)) )
+  heappush(tree, (0 + h_start, 0, [], initial, 0) )
 
-  while not tree.empty():
-    (priority, (path,get_board,depth)) = tree.get()
-    print str(priority) + "  " + " ".join(path)
+  while len(tree):
+    ( (priority, priority_extra, path, get_board, depth) ) = heappop(tree)
 
     #check if board is in finished position, in which case print path to get there
     if is_complete(get_board):
@@ -110,14 +125,15 @@ def a_star(board):
           new_board[y_zero+y_delta][x_zero+x_delta] = 0
           new_board[y_zero][x_zero] = temp
 
-          if new_board not in explored:
-            explored.append(list(curr_board))
-            new_path = path + [name]
+          if hash_fn(new_board) not in explored:
+            explored.append( hash_fn(curr_board) )
+            new_path = list(path) + [name]
             new_depth = depth + 1
             f_value = new_depth + calc_h(new_board, solved_board)
 
-            tree.put( (f_value, (list(new_path), list(new_board), new_depth)) )
+            priority_second = weight[name]
 
+            heappush(tree, (f_value, priority_second, list(new_path), new_board, new_depth) )
 
   print "UNSOLVABLE"
   return
