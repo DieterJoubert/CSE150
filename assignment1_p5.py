@@ -62,18 +62,6 @@ def calc_h(check_board, solved_board):
 
   return h
 
-def calc_hOLD(check_board, solved_board):
-  h = 0
-
-  coordinates = {}
-
-  for y in range(len(check_board)):
-    for x in range(len(check_board[0])):
-      if solved_board[y][x] != check_board[y][x]:
-        h += 1
-
-  return h
-
 #breadth first search of the board for a solution
 def a_star(board):
   directionOLD = [ ('U',(-1, 0)), ('D',(1, 0)), ('L',(0, -1)), ('R',(0, 1)) ]

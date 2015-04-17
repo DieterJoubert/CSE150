@@ -13,37 +13,9 @@ def is_complete(board):
         return False
   return True
 
-#check the number of inversions, if odd, not solvable
-def is_solvable(board):
-  inv_count = 0
-
-  nums = []
-  #for each position on the board
-  for y in range(len(board)):
-    for x in range(len(board[0])):
-      check = board[y][x]
-
-      if check != 0:
-        nums.append(check)
-
-  for i in range(len(nums)):
-    for j in range(i,len(nums)):
-      if nums[i] > nums[j]:
-        inv_count += 1
-
-  #if odd number of inversions, cannot be solved, else can be
-  if (inv_count % 2 == 1):
-    return False
-  else:
-    return True
-
 def main():
   import sys
   board = [[int(n.strip()) for n in line.split(',')] for line in sys.stdin.readlines()] 
-
-  #check if board can't be solved, in which case end main, print UNSOLVABLE
-  #if not is_solvable(board):
-  #  print("UNSOLVABLE")
 
   #check if board finished, in which case don't print anything, end main
   if is_complete(board):
@@ -68,16 +40,9 @@ def getzero(board):
 def yxmax(board):
   return (len(board)-1, len(board[0])-1)
 
-def print_board(board):
-  for i in board:
-    string = ""
-    for j in i:
-      string += " " + str(j)
-    print string
-
 #breadth first search of the board for a solution
 def dfs(board):
-  direction = [ ('U',(-1, 0)), ('R',(0, 1)), ('D',(1, 0)), ('L',(0, -1))]
+  direction = [ ('U', (-1,0)), ('D', (1,0)), ('L', (0,-1)), ('R', (0,1))]
 
   initial = board
   explored = []

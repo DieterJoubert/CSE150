@@ -40,13 +40,6 @@ def getzero(board):
 def yxmax(board):
   return (len(board)-1, len(board[0])-1)
 
-def print_board(board):
-  for i in board:
-    string = ""
-    for j in i:
-      string += " " + str(j)
-    print string
-
 #breadth first search of the board for a solution
 def bfs(board):
   direction = [ ('U',(-1, 0)), ('D',(1, 0)), ('L',(0, -1)), ('R',(0, 1)) ]
@@ -92,7 +85,6 @@ def bfs(board):
 
   print "UNSOLVABLE"
   return
-
 
 if __name__ == '__main__':
   main()
