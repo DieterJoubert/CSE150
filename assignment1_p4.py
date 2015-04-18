@@ -39,26 +39,30 @@ def yxmax(board):
     return(len(board) - 1, len(board[0]) - 1)
  
 def dfsiterative(board):
-    direction = [ ('U', (-1,0)), ('D', (1,0)), ('L', (0,-1)), ('R', (0,1))]
+    directionOLD = [ ('U', (-1,0)), ('D', (1,0)), ('L', (0,-1)), ('R', (0,1))]
+    direction = directionOLD[::-1]
  
     initial = board
     MAX_DEPTH = 13
+
+    count = 0
  
     for currdepth in range(MAX_DEPTH):
-        tree = Queue.Queue()
+
+        tree = Queue.LifoQueue()
         tree.put( ([],initial,0) )
         explored = []
-        
-        #explored.append(list(board))
- 
+         
         while not tree.empty():
             (path,getboard,depth) = tree.get()
  
-            if is_complete(getboard):
+            if depth == currdepth and is_complete(getboard):
+
                 print "".join(path)
                 return
  
             elif depth < currdepth:
+
                 currboard = copy.deepcopy(getboard)
                 explored.append(hash_fn(currboard))
                 
