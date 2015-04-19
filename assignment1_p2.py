@@ -1,3 +1,5 @@
+__author__ = 'djoubert@ucsd.edu,jluttrell@ucsd.edu,scornett@ucsd.edu'
+
 import Queue
 import copy
 

@@ -1,4 +1,4 @@
-__author__ = ’djoubert@ucsd.edu,student2@ucsd.edu,student3@ucsd.edu’
+__author__ = 'djoubert@ucsd.edu,jluttrell@ucsd.edu,scornett@ucsd.edu'
 
 def is_complete(board):
   if board == []:

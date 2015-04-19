@@ -1,3 +1,5 @@
+__author__ = 'djoubert@ucsd.edu,jluttrell@ucsd.edu,scornett@ucsd.edu'
+
 import Queue
 import copy
  
@@ -39,13 +41,13 @@ def yxmax(board):
     return(len(board) - 1, len(board[0]) - 1)
  
 def dfsiterative(board):
-    directionOLD = [ ('U', (-1,0)), ('D', (1,0)), ('L', (0,-1)), ('R', (0,1))]
-    direction = directionOLD[::-1]
+
+    #since using LifoQueue (stack) for DFS, reverse direction list to retrieve Up first
+    direction_FIFO = [ ('U', (-1,0)), ('D', (1,0)), ('L', (0,-1)), ('R', (0,1))]
+    direction = direction_FIFO[::-1]
  
     initial = board
     MAX_DEPTH = 13
-
-    count = 0
  
     for currdepth in range(MAX_DEPTH):
 
@@ -57,12 +59,10 @@ def dfsiterative(board):
             (path,getboard,depth) = tree.get()
  
             if depth == currdepth and is_complete(getboard):
-
                 print "".join(path)
                 return
  
             elif depth < currdepth:
-
                 currboard = copy.deepcopy(getboard)
                 explored.append(hash_fn(currboard))
                 
@@ -79,6 +79,8 @@ def dfsiterative(board):
                         if hash_fn(newboard) not in explored:
                             newpath = path + [direct]
                             tree.put( (list(newpath), list(newboard), depth + 1) )
+
+    #if can't find path, print unsolvable
     print "UNSOLVABLE"
     return
  

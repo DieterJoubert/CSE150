@@ -1,3 +1,5 @@
+__author__ = 'djoubert@ucsd.edu,jluttrell@ucsd.edu,scornett@ucsd.edu'
+
 import Queue
 import copy
 from heapq import *
@@ -64,10 +66,9 @@ def calc_h(check_board, solved_board):
 
 #breadth first search of the board for a solution
 def a_star(board):
-  directionOLD = [ ('U',(-1, 0)), ('D',(1, 0)), ('L',(0, -1)), ('R',(0, 1)) ]
-  direction = directionOLD
+  direction = [ ('U',(-1, 0)), ('D',(1, 0)), ('L',(0, -1)), ('R',(0, 1)) ]
 
-  weightOLD = {'U': 1, 'D': 2, 'L': 3, 'R': 4}
+  #attach a weight to each direction to use as second priority in case of ties
   weight = {'U': 4, 'D': 3, 'L': 2, 'R': 1}
 
   initial = copy.deepcopy(board)
@@ -87,6 +88,8 @@ def a_star(board):
 
   tree = []
   h_start = calc_h(initial,solved_board)
+
+  #push "root" to tree
   heappush(tree, (0 + h_start, 0, [], initial, 0) )
 
   while len(tree):
@@ -102,7 +105,6 @@ def a_star(board):
       explored.append( hash_fn(curr_board) )
       
       for (name, (y_delta,x_delta)) in direction:
-        #TODO: doble check direction is ok
 
         (y_zero, x_zero) = getzero(curr_board)
         (y_max, x_max) = yxmax(curr_board)
@@ -116,6 +118,7 @@ def a_star(board):
           new_board[y_zero+y_delta][x_zero+x_delta] = 0
           new_board[y_zero][x_zero] = temp
 
+          #if new board state has not been explored, add it to tree
           if hash_fn(new_board) not in explored:
             new_path = list(path) + [name]
             new_depth = depth + 1

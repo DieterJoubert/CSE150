@@ -1,3 +1,5 @@
+__author__ = 'djoubert@ucsd.edu,jluttrell@ucsd.edu,scornett@ucsd.edu'
+
 import Queue
 import copy
 
@@ -42,13 +44,12 @@ def yxmax(board):
 
 #breadth first search of the board for a solution
 def dfs(board):
-  direction = [ ('U', (-1,0)), ('D', (1,0)), ('L', (0,-1)), ('R', (0,1))]
+  direction_FIFO = [ ('U', (-1,0)), ('D', (1,0)), ('L', (0,-1)), ('R', (0,1))]
+  direction = direction_FIFO[::-1]
 
   initial = board
   explored = []
   
-  #explored.append(hash_fn(board))
-
   #use a LIFO queue to DFS, put path of moves so far and board itself in queue
   tree = Queue.LifoQueue()
   tree.put( ([],initial,0) )
