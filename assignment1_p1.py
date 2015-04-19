@@ -1,4 +1,4 @@
-#TODO AT END: rename to assignment1_p1.py
+__author__ = ’djoubert@ucsd.edu,student2@ucsd.edu,student3@ucsd.edu’
 
 def is_complete(board):
   if board == []:
