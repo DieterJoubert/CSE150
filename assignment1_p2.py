@@ -58,6 +58,7 @@ def bfs(board):
       curr_board = copy.deepcopy(get_board)
       explored.append(hash_fn(curr_board))
 
+      # check all four possible movement directions
       for (name, (y_delta,x_delta)) in direction:
 
         (y_zero, x_zero) = getzero(curr_board)
@@ -76,6 +77,7 @@ def bfs(board):
             new_path = path + [name]
             tree.put( (list(new_path), list(new_board)) )
 
+  #if no path to solution was found
   print "UNSOLVABLE"
   return
 

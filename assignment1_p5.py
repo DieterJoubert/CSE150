@@ -101,6 +101,7 @@ def a_star(board):
       curr_board = copy.deepcopy(get_board)
       explored.append( hash_fn(curr_board) )
       
+      # check all four possible movement directions      
       for (name, (y_delta,x_delta)) in direction:
 
         (y_zero, x_zero) = getzero(curr_board)

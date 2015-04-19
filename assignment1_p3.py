@@ -37,6 +37,7 @@ def yxmax(board):
 
 #breadth first search of the board for a solution
 def dfs(board):
+  #since using LifoQueue (stack) for DFS, reverse direction list to retrieve Up first
   direction_FIFO = [ ('U', (-1,0)), ('D', (1,0)), ('L', (0,-1)), ('R', (0,1))]
   direction = direction_FIFO[::-1]
 
@@ -59,6 +60,7 @@ def dfs(board):
       curr_board = copy.deepcopy(get_board)
       explored.append(hash_fn(curr_board))
 
+      # check all four possible movement directions
       for (name, (y_delta,x_delta)) in direction:
 
         (y_zero, x_zero) = getzero(curr_board)
@@ -77,6 +79,7 @@ def dfs(board):
             new_path = path + [name]
             tree.put( (list(new_path), list(new_board), depth+1) )
 
+  # no solution path was found
   print "UNSOLVABLE"
   return
 
