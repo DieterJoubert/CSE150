@@ -22,6 +22,13 @@ def main():
     else:
         dfsiterative(board)
  
+def hash_fn(board):
+  hash_string = ""
+  for i in board:
+    for j in i:
+      hash_string += str(j)
+  return hash(hash_string)
+ 
 def getzero(board):
     for y in range(len(board)):
         for x in range(len(board[0])):
@@ -41,7 +48,8 @@ def dfsiterative(board):
         tree = Queue.Queue()
         tree.put( ([],initial,0) )
         explored = []
-        explored.append(list(board))
+        
+        #explored.append(list(board))
  
         while not tree.empty():
             (path,getboard,depth) = tree.get()
@@ -52,7 +60,7 @@ def dfsiterative(board):
  
             elif depth < currdepth:
                 currboard = copy.deepcopy(getboard)
-                explored.append(list(currboard))
+                explored.append(hash_fn(currboard))
                 
                 for(direct, (ydelt, xdelt)) in direction:
                     (yzero, xzero) = getzero(currboard)
@@ -64,7 +72,7 @@ def dfsiterative(board):
                         newboard[yzero + ydelt][xzero + xdelt] = 0
                         newboard[yzero][xzero] = temp
  
-                        if newboard not in explored:
+                        if hash_fn(newboard) not in explored:
                             newpath = path + [direct]
                             tree.put( (list(newpath), list(newboard), depth + 1) )
     print "UNSOLVABLE"

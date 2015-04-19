@@ -1,5 +1,6 @@
-__author__ = ’djoubert@ucsd.edu,student2@ucsd.edu,student3@ucsd.edu’
+__author__ = 'djoubert@ucsd.edu,jluttrell@ucsd.edu,scornett@ucsd.edu'
 
+#check if board is in complete state
 def is_complete(board):
   if board == []:
     return False
@@ -15,6 +16,7 @@ def is_complete(board):
 def main():
   import sys
   board = [[int(n.strip()) for n in line.split(',')] for line in sys.stdin.readlines()] 
+  #print the boolean result of calling is_complete on the board (True if board is solved)
   print(is_complete(board))
 
 if __name__ == '__main__':

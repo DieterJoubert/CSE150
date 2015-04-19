@@ -1,7 +1,10 @@
+__author__ = 'djoubert@ucsd.edu,jluttrell@ucsd.edu,scornett@ucsd.edu'
+
 import Queue
 import copy
 from heapq import *
 
+#check if board is in completed state
 def is_complete(board):
   if board == []:
     return False
@@ -14,16 +17,7 @@ def is_complete(board):
         return False
   return True
 
-def main():
-  import sys
-  board = [[int(n.strip()) for n in line.split(',')] for line in sys.stdin.readlines()] 
-
-  if is_complete(board):
-    print ""
-  
-  else:
-    a_star(board)
-
+# takes board state, turns it into string, and hashes string to create unique int representation
 def hash_fn(board):
   hash_string = ""
   for i in board:
@@ -31,18 +25,23 @@ def hash_fn(board):
       hash_string += str(j)
   return hash(hash_string)    
 
+#gets the (y,x) coordinates of the 0 tile on the board
 def getzero(board):
   for y in range(len(board)):
     for x in range(len(board[0])):
       if board[y][x] == 0:
         return (y,x)
 
+#gets the maximum (y,x) coordinates a tile can be on the board
 def yxmax(board):
   return (len(board)-1, len(board[0])-1)
 
+#gets the length and width of the board as (length, width)
 def lengthwidth(board):
   return (len(board), len(board[0]))  
 
+# Heuristic that calculates how far each tile is from its solved state, in terms of
+# horizontal and vertical moves. Sums the result of all tiles
 def calc_h(check_board, solved_board):
   h = 0
 
@@ -62,12 +61,11 @@ def calc_h(check_board, solved_board):
 
   return h
 
-#breadth first search of the board for a solution
+# A* search of the board that prints the moves for a solution, or "UNSOLVABLE" if none can be found
 def a_star(board):
-  directionOLD = [ ('U',(-1, 0)), ('D',(1, 0)), ('L',(0, -1)), ('R',(0, 1)) ]
-  direction = directionOLD
+  direction = [ ('U',(-1, 0)), ('D',(1, 0)), ('L',(0, -1)), ('R',(0, 1)) ]
 
-  weightOLD = {'U': 1, 'D': 2, 'L': 3, 'R': 4}
+  #attach a weight to each direction to use as second priority in case of ties
   weight = {'U': 4, 'D': 3, 'L': 2, 'R': 1}
 
   initial = copy.deepcopy(board)
@@ -87,6 +85,8 @@ def a_star(board):
 
   tree = []
   h_start = calc_h(initial,solved_board)
+
+  #push "root" to tree
   heappush(tree, (0 + h_start, 0, [], initial, 0) )
 
   while len(tree):
@@ -101,8 +101,8 @@ def a_star(board):
       curr_board = copy.deepcopy(get_board)
       explored.append( hash_fn(curr_board) )
       
+      # check all four possible movement directions      
       for (name, (y_delta,x_delta)) in direction:
-        #TODO: doble check direction is ok
 
         (y_zero, x_zero) = getzero(curr_board)
         (y_max, x_max) = yxmax(curr_board)
@@ -116,6 +116,7 @@ def a_star(board):
           new_board[y_zero+y_delta][x_zero+x_delta] = 0
           new_board[y_zero][x_zero] = temp
 
+          #if new board state has not been explored, add it to tree
           if hash_fn(new_board) not in explored:
             new_path = list(path) + [name]
             new_depth = depth + 1
@@ -123,8 +124,19 @@ def a_star(board):
             priority_second = weight[name]
             heappush(tree, (f_value, priority_second, list(new_path), new_board, new_depth) )
 
+  #if no solution is found
   print "UNSOLVABLE"
   return
 
+def main():
+  import sys
+  board = [[int(n.strip()) for n in line.split(',')] for line in sys.stdin.readlines()] 
+
+  if is_complete(board):
+    print ""
+  
+  else:
+    a_star(board)
+
 if __name__ == '__main__':
-  main()
+  main()    

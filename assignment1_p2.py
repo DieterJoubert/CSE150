@@ -1,29 +1,22 @@
+__author__ = 'djoubert@ucsd.edu,jluttrell@ucsd.edu,scornett@ucsd.edu'
+
 import Queue
 import copy
 
+#check if board is in completed state
 def is_complete(board):
   if board == []:
     return False
   last = -1
-  for lst in board:
-    for i in lst:
+  for row in board:
+    for i in row:
       if i == last+1:
         last = i
       else:
         return False
   return True
 
-def main():
-  import sys
-  board = [[int(n.strip()) for n in line.split(',')] for line in sys.stdin.readlines()] 
-
-  #check if board finished, in which case don't print anything, end main
-  if is_complete(board):
-    print ""
-  
-  else:
-    bfs(board)
-
+# takes board state, turns it into string, and hashes string to create unique int representation
 def hash_fn(board):
   hash_string = ""
   for i in board:
@@ -31,12 +24,14 @@ def hash_fn(board):
       hash_string += str(j)
   return hash(hash_string)
 
+#gets the (y,x) coordinates of the 0 tile on the board
 def getzero(board):
   for y in range(len(board)):
     for x in range(len(board[0])):
       if board[y][x] == 0:
         return (y,x)
 
+#gets the maximum (y,x) coordinates a tile can be on the board
 def yxmax(board):
   return (len(board)-1, len(board[0])-1)
 
@@ -47,8 +42,6 @@ def bfs(board):
   initial = board
   explored = []
   
-  #explored.append(hash_fn(board))
-
   #use a queue to BFS, put path of moves so far and board itself in queue
   tree = Queue.Queue()
   tree.put( ([],initial) )
@@ -65,6 +58,7 @@ def bfs(board):
       curr_board = copy.deepcopy(get_board)
       explored.append(hash_fn(curr_board))
 
+      # check all four possible movement directions
       for (name, (y_delta,x_delta)) in direction:
 
         (y_zero, x_zero) = getzero(curr_board)
@@ -83,8 +77,20 @@ def bfs(board):
             new_path = path + [name]
             tree.put( (list(new_path), list(new_board)) )
 
+  #if no path to solution was found
   print "UNSOLVABLE"
   return
+
+def main():
+  import sys
+  board = [[int(n.strip()) for n in line.split(',')] for line in sys.stdin.readlines()] 
+
+  #check if board finished, in which case don't print anything, end main
+  if is_complete(board):
+    print ""
+  
+  else:
+    bfs(board)  
 
 if __name__ == '__main__':
   main()
