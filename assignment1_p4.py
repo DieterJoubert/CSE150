@@ -3,40 +3,35 @@ __author__ = 'djoubert@ucsd.edu,jluttrell@ucsd.edu,scornett@ucsd.edu'
 import Queue
 import copy
  
+#check if board is in completed state
 def is_complete(board):
-    if board == []:
+  if board == []:
+    return False
+  last = -1
+  for row in board:
+    for i in row:
+      if i == last+1:
+        last = i
+      else:
         return False
-    last = -1
-    for lst in board:
-        for i in lst:
-            if i == last + 1:
-                last = i
-            else:
-                return False
-    return True
- 
-def main():
-    import sys
-    board = [[int(n.strip()) for n in line.split(',')] for line in sys.stdin.readlines()] 
- 
-    if is_complete(board):
-        print ""
-    else:
-        dfsiterative(board)
+  return True
 
+# takes board state, turns it into string, and hashes string to create unique int representation
 def hash_fn(board):
   hash_string = ""
   for i in board:
     for j in i:
       hash_string += str(j)
   return hash(hash_string)
- 
+
+#gets the (y,x) coordinates of the 0 tile on the board
 def getzero(board):
     for y in range(len(board)):
         for x in range(len(board[0])):
             if(board[y][x] == 0):
                 return (y,x)
- 
+
+#gets the maximum (y,x) coordinates a tile can be on the board
 def yxmax(board):
     return(len(board) - 1, len(board[0]) - 1)
  
@@ -46,7 +41,7 @@ def dfsiterative(board):
     direction_FIFO = [ ('U', (-1,0)), ('D', (1,0)), ('L', (0,-1)), ('R', (0,1))]
     direction = direction_FIFO[::-1]
  
-    initial = board
+    initial = copy.deepcopy(board)
     MAX_DEPTH = 13
  
     for currdepth in range(MAX_DEPTH):
@@ -84,5 +79,14 @@ def dfsiterative(board):
     print "UNSOLVABLE"
     return
  
+def main():
+    import sys
+    board = [[int(n.strip()) for n in line.split(',')] for line in sys.stdin.readlines()] 
+ 
+    if is_complete(board):
+        print ""
+    else:
+        dfsiterative(board)
+
 if __name__ == '__main__':
     main()
