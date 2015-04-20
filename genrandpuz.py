@@ -1,11 +1,12 @@
 import sys
 import random
+import copy
 
 '''
 run the program like this:
-python genrandpuz.py [filename] [numofrandommoves]
 
-file name will always by the solved puzzles 3by3.txt, 4by4.txt, 5by5.txt
+python genrandpuz.py [ysize] [xsize] [numofrandommoves]
+
 the new puzzle will always write to a file called statout.txt
 so we can call our p2-p5 stat files on statout.txt
 '''
@@ -21,11 +22,27 @@ def getzero(board):
 def yxmax(board):
   return (len(board)-1, len(board[0])-1)
 
+def createBoard(ysize, xsize):
+    num = 0
+    y = []
 
-f = open(sys.argv[1], 'r+')
-board = [[int(n.strip()) for n in line.split(',')] for line in f.readlines()] 
+    for i in range(ysize):
+        temp = []
+        for j in range(xsize):
+            temp.append(num)
+            num = num + 1
+        x = copy.deepcopy(temp)
+        y.append(x)
+    return y
 
-numofmoves = int(sys.argv[2])
+
+#f = open(sys.argv[1], 'r+')
+#board = [[int(n.strip()) for n in line.split(',')] for line in f.readlines()] 
+ysize = int(sys.argv[1])
+xsize = int(sys.argv[2])
+numofmoves = int(sys.argv[3])
+board = createBoard(ysize, xsize)
+
 direction = [ ('U',(-1, 0)), ('D',(1, 0)), ('L',(0, -1)), ('R',(0, 1)) ]
 
 for i in range(numofmoves):
@@ -46,7 +63,7 @@ for i in range(numofmoves):
             board[y_zero][x_zero] = temp
 
 line = ""
-f.close()
+#f.close()
 
 f = open("statout.txt", 'w')
 for y in range(len(board)):
