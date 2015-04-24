@@ -6,10 +6,13 @@ __email__ = 'ttsuchida@ucsd.edu'
 
 import sys, os
 from types import MethodType
-from Queue import Empty
 from multiprocessing import Process, Queue
+try:
+    from queue import Empty
+except ImportError:
+    from Queue import Empty
 
-from assignment2 import Player, State
+from assignment2 import Player, State, Action
 
 
 class Game(object):
@@ -146,4 +149,14 @@ if __name__ == '__main__':
                   inspect.isclass(getattr(module, name)) and issubclass(getattr(module, name), Player)])
     player_classes = [getattr(names[name], name) for name in player_names]
 
-    ConsoleGame(M, N, K, player_classes, timeout).play()
+    game = ConsoleGame(M, N, K, player_classes, timeout)
+
+    # Read state from console, if provided
+    if not sys.stdin.isatty():
+        input_string = sys.stdin.read().strip()
+        if len(input_string) > 0:
+            game.state = eval(input_string)
+            game.state.to_play = game.players[game.state.last_action.color % len(game.players)]
+        sys.stdin = open('/dev/tty')
+
+    game.play()

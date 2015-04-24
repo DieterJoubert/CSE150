@@ -109,6 +109,7 @@ class State(object):
         self.K = K
         self.board = board
         self.last_action = last_action
+        assert last_action is None or self.board[last_action.location[0]][last_action.location[1]] == last_action.color
         self.to_play = to_play
         self._is_terminal = None
         self._winner_color = None
@@ -185,6 +186,7 @@ class State(object):
     def is_win(self):
         """Calculates whether the last action resulted in this state being a win for that player."""
         li, lj = self.last_action.location
+        assert 0 <= li < self.M and 0 <= lj < self.N, "%s is outside of the board" % self.last_action.location
         color = self.last_action.color
 
         # The coordinates where we want to start the checks
@@ -234,7 +236,6 @@ class State(object):
         assert self.board[li][lj] == 0, "Illegal action: %s" % repr(action)
 
         # Convert to list, modify and convert back to tuples
-        board = map(list, self.board)
+        board = list(map(list, self.board))
         board[li][lj] = action.color
         return State(self.K, tuple(map(tuple, board)), action, self.to_play.next)
-

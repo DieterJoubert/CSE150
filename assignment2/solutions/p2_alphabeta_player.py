@@ -16,4 +16,4 @@ class AlphaBetaPlayer(Player):
         """
 
         # TODO implement this
-        return Action(state.to_play.color, (0, 0))
+        return state.actions()[0]
