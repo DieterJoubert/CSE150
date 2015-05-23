@@ -73,14 +73,6 @@ def ac3(csp, arcs=None):
         if Xi.domain is None or len(Xi.domain) == 0:
           return False
         
-        """
-        for neighbor in csp.constraints[Xi]:
-          X_k = neighbor.var2
-          if X_k == Xi or X_k == Xj:
-            continue
-          else:
-            queue_arcs.append( (X_k, Xi) )
-        """
         for (a, b) in csp.constraints[Xi].arcs():
           if b == Xi or b == Xj:
             continue
@@ -120,38 +112,6 @@ def revise(csp, xi, xj):
     return revised
 
 
-
-
-"""
-def revise(csp, xi, xj):
-    revised = False
-
-    to_delete = []
-
-    for val_i in xi.domain:
-      found = False
-
-      for const in csp.constraints[xi, xj]:
-
-        for val_j in xj.domain:
-
-          if const.is_satisfied(val_i, val_j):
-            found = True
-            break
-
-      if found == False:
-        to_delete.append(val_i)
-        revised = True
-
-    for val in to_delete:
-      xi.domain = xi.domain.remove(val)
-
-    return revised
-"""
-
-
-
-
 def select_unassigned_variable(csp):
     """Selects the next unassigned variable, or None if there is no more unassigned variables
     (i.e. the assignment is complete).
@@ -159,30 +119,6 @@ def select_unassigned_variable(csp):
     For P3, *you do not need to modify this method.*
     """
     return next((variable for variable in csp.variables if not variable.is_assigned()))
-
-
-
-
-"""
-def select_unassigned_variable(csp):
-    if is_complete(csp):
-      return None
-
-    min_var = None
-    min_dom = 9999
-
-    for var in csp.variables:
-
-      if var.is_assigned():
-        continue
-
-      elif len(var.domain) < min_dom:
-        min_var = var
-        min_dom == len(var.domain)
-
-    return min_var
-"""
-
 
 
 def is_complete(csp):
@@ -204,34 +140,6 @@ def is_consistent(csp, variable, value):
           return False
 
     return True
-
-"""
-def is_consistent(csp, variable, value):
-    for const in csp.constraints[variable]:
-
-      var_neighbor = const.var2
-
-      for val in var_neighbor.domain:
-        if not const.is_satisfied(value, val):
-          return False
-
-    return True
-"""
-
-
-
-
-"""
-    for var2 in csp.variables:
-      if not var2.is_assigned() or var2 == variable:
-        continue
-      else:
-        for const in csp.constraints[variable, var2]:
-          if not const.is_satisfied(value, var2.value):
-            return False
-    return True
-"""
-
 
 
 def order_domain_values(csp, variable):
