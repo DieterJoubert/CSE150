@@ -11,7 +11,6 @@ def inference(csp, variable):
     """
     return ac3(csp, csp.constraints[variable].arcs())
 
-
 def backtracking_search(csp):
     """Entry method for the CSP solver.  This method calls the backtrack method to solve the given CSP.
 
@@ -54,7 +53,6 @@ def backtrack(csp):
     return False
 
 
-
 def ac3(csp, arcs=None):
     """Executes the AC3 or the MAC (p.218 of the textbook) algorithms.
 
@@ -75,14 +73,22 @@ def ac3(csp, arcs=None):
         if Xi.domain is None or len(Xi.domain) == 0:
           return False
         
+        """
         for neighbor in csp.constraints[Xi]:
           X_k = neighbor.var2
           if X_k == Xi or X_k == Xj:
             continue
           else:
             queue_arcs.append( (X_k, Xi) )
+        """
+        for (a, b) in csp.constraints[Xi].arcs():
+          if b == Xi or b == Xj:
+            continue
+          else:
+            queue_arcs.append( (b, a) )
 
     return True
+
 
 
 def revise(csp, xi, xj):
@@ -90,9 +96,11 @@ def revise(csp, xi, xj):
 
     to_delete = []
 
-    for val_i in xi.domain:
+    for const in csp.constraints[xi, xj]:
+
       found = False
-      for const in csp.constraints[xi, xj]:
+
+      for val_i in xi.domain:
         for val_j in xj.domain:
           if const.is_satisfied(val_i, val_j):
             found = True
@@ -112,16 +120,51 @@ def revise(csp, xi, xj):
     return revised
 
 
+
+
+"""
+def revise(csp, xi, xj):
+    revised = False
+
+    to_delete = []
+
+    for val_i in xi.domain:
+      found = False
+
+      for const in csp.constraints[xi, xj]:
+
+        for val_j in xj.domain:
+
+          if const.is_satisfied(val_i, val_j):
+            found = True
+            break
+
+      if found == False:
+        to_delete.append(val_i)
+        revised = True
+
+    for val in to_delete:
+      xi.domain = xi.domain.remove(val)
+
+    return revised
+"""
+
+
+
+
 def select_unassigned_variable(csp):
     """Selects the next unassigned variable, or None if there is no more unassigned variables
     (i.e. the assignment is complete).
 
-    This method implements the minimum-remaining-values (MRV) and degree heuristic. That is,
-    the variable with the smallest number of values left in its available domain.  If MRV ties,
-    then it picks the variable that is involved in the largest number of constraints on other
-    unassigned variables.
+    For P3, *you do not need to modify this method.*
     """
+    return next((variable for variable in csp.variables if not variable.is_assigned()))
 
+
+
+
+"""
+def select_unassigned_variable(csp):
     if is_complete(csp):
       return None
 
@@ -135,8 +178,11 @@ def select_unassigned_variable(csp):
 
       elif len(var.domain) < min_dom:
         min_var = var
+        min_dom == len(var.domain)
 
     return min_var
+"""
+
 
 
 def is_complete(csp):
@@ -148,28 +194,34 @@ def is_complete(csp):
 
 
 def is_consistent(csp, variable, value):
-    """Returns True when the variable assignment to value is consistent, i.e. it does not violate any of the constraints
-    associated with the given variable for the variables that have values assigned.
-
-    For example, if the current variable is X and its neighbors are Y and Z (there are constraints (X,Y) and (X,Z)
-    in csp.constraints), and the current assignment as Y=y, we want to check if the value x we want to assign to X
-    violates the constraint c(x,y).  This method does not check c(x,Z), because Z is not yet assigned."""
-
     for const in csp.constraints[variable]:
-      print const
 
       var_neighbor = const.var2
       if var_neighbor.is_assigned() == False:
         continue
       else:
         if not const.is_satisfied(value, var_neighbor.value):
-          print "NOT SATIS"
           return False
 
-    print "SATISFIED"
     return True
 
-    """
+"""
+def is_consistent(csp, variable, value):
+    for const in csp.constraints[variable]:
+
+      var_neighbor = const.var2
+
+      for val in var_neighbor.domain:
+        if not const.is_satisfied(value, val):
+          return False
+
+    return True
+"""
+
+
+
+
+"""
     for var2 in csp.variables:
       if not var2.is_assigned() or var2 == variable:
         continue
@@ -178,16 +230,11 @@ def is_consistent(csp, variable, value):
           if not const.is_satisfied(value, var2.value):
             return False
     return True
-    """
+"""
+
+
 
 def order_domain_values(csp, variable):
-    """Returns a list of (ordered) domain values for the given variable.
-
-    This method implements the least-constraining-value (LCV) heuristic; that is, the value
-    that rules out the fewest choices for the neighboring variables in the constraint graph
-    are placed before others.
-    """
-
     import Queue
     q = Queue.PriorityQueue()
 
@@ -210,6 +257,8 @@ def order_domain_values(csp, variable):
       result.append(value)
 
     return result
+
+
 
 def neighbor_choices(csp, var):      
   choices = 0

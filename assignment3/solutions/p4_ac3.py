@@ -33,7 +33,6 @@ def ac3(csp, arcs=None):
     return True
 
 
-
 def revise(csp, xi, xj):
     revised = False
 
