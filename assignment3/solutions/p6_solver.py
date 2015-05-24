@@ -5,10 +5,7 @@ __email__ = 'Please write your email addresses, separated by commas.'
 from collections import deque
 
 def inference(csp, variable):
-    """Performs an inference procedure for the variable assignment.
-
-    For P6, *you do not need to modify this method.*
-    """
+    """Performs an inference procedure for the variable assignment. """
     return ac3(csp, csp.constraints[variable].arcs())
 
 def backtracking_search(csp):
@@ -16,14 +13,11 @@ def backtracking_search(csp):
 
     If there is a solution, this method returns the successful assignment (a dictionary of variable to value);
     otherwise, it returns None.
-
-    For P6, *you do not need to modify this method.*
     """
     if backtrack(csp):
         return csp.assignment
     else:
         return None
-
 
 def backtrack(csp):
     """Performs the backtracking search for the given csp.
@@ -51,7 +45,6 @@ def backtrack(csp):
         csp.variables.rollback()
 
     return False
-
 
 def ac3(csp, arcs=None):
     """Executes the AC3 or the MAC (p.218 of the textbook) algorithms.
@@ -81,8 +74,6 @@ def ac3(csp, arcs=None):
 
     return True
 
-
-
 def revise(csp, xi, xj):
     revised = False
 
@@ -111,25 +102,47 @@ def revise(csp, xi, xj):
 
     return revised
 
-
 def select_unassigned_variable(csp):
     """Selects the next unassigned variable, or None if there is no more unassigned variables
     (i.e. the assignment is complete).
 
-    For P3, *you do not need to modify this method.*
+    This method implements the minimum-remaining-values (MRV) and degree heuristic. That is,
+    the variable with the smallest number of values left in its available domain.  If MRV ties,
+    then it picks the variable that is involved in the largest number of constraints on other
+    unassigned variables.
     """
-    return next((variable for variable in csp.variables if not variable.is_assigned()))
+    if is_complete(csp):
+      return None
 
+    min_domain = 99999999999
+    min_var = None
+
+    for var in csp.variables:
+
+      if var.is_assigned():
+        continue
+
+      if len( var.domain ) < min_domain:
+        min_domain = len( var.domain )
+        min_var = var
+
+    return min_var
 
 def is_complete(csp):
-  """Returns True when the CSP assignment is complete, i.e. all of the variables in the CSP have values assigned."""  
-  for var in csp.variables:
-    if var.is_assigned() == False:
-      return False
-  return True
+    """Returns True when the CSP assignment is complete, i.e. all of the variables in the CSP have values assigned."""  
+    for var in csp.variables:
+      if var.is_assigned() == False:
+        return False
+    return True
 
 
 def is_consistent(csp, variable, value):
+    """Returns True when the variable assignment to value is consistent, i.e. it does not violate any of the constraints
+    associated with the given variable for the variables that have values assigned.
+
+    For example, if the current variable is X and its neighbors are Y and Z (there are constraints (X,Y) and (X,Z)
+    in csp.constraints), and the current assignment as Y=y, we want to check if the value x we want to assign to X
+    violates the constraint c(x,y).  This method does not check c(x,Z), because Z is not yet assigned."""  
     for const in csp.constraints[variable]:
 
       var_neighbor = const.var2
@@ -141,8 +154,13 @@ def is_consistent(csp, variable, value):
 
     return True
 
-
 def order_domain_values(csp, variable):
+    """Returns a list of (ordered) domain values for the given variable.
+
+    This method implements the least-constraining-value (LCV) heuristic; that is, the value
+    that rules out the fewest choices for the neighboring variables in the constraint graph
+    are placed before others.
+    """  
     import Queue
     q = Queue.PriorityQueue()
 
@@ -166,20 +184,18 @@ def order_domain_values(csp, variable):
 
     return result
 
-
-
 def neighbor_choices(csp, var):      
-  choices = 0
-  for value in var.domain:
-    for var_other in csp.variables:
-      if var_other.is_assigned() or var_other == var:
-        continue
-      else:
-        for const in csp.constraints[var, var_other]:
-          for val_other in var_other.domain:
+    choices = 0
+    for value in var.domain:
+      for var_other in csp.variables:
+        if var_other.is_assigned() or var_other == var:
+          continue
+        else:
+          for const in csp.constraints[var, var_other]:
+            for val_other in var_other.domain:
 
-            if const.is_satisfied(value, val_other):
-              choices += 1
-  return choices
+              if const.is_satisfied(value, val_other):
+                choices += 1
+    return choices
 
 

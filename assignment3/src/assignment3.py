@@ -265,7 +265,7 @@ class Futoshiki(object):
         """Converts the string format used in the javascript on futoshiki.org
         to the 'more easily interpretable' format used in this class."""
         charmap = {'.': '0', '_': ' ', ')': '>', '(': '<', 'v': 'v', '^': '^'}
-        for i in range(1, 9):
+        for i in range(1, 10):
             charmap[str(i)] = str(i)
 
         K = int(sqrt(len(input_text)))

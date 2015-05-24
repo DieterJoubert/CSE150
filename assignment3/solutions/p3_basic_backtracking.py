@@ -67,11 +67,6 @@ def backtrack(csp):
 
     return False
 
-
-
-
-#HELPER METHODS FROM p2 and p1
-
 def is_consistent(csp, variable, value):
     """Returns True when the variable assignment to value is consistent, i.e. it does not violate any of the constraints
     associated with the given variable for the variables that have values assigned.
