@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-__author__ = 'Please write your names, separated by commas.'
-__email__ = 'Please write your email addresses, separated by commas.'
+__author__ = "Dieter Joubert, Joseph Luttrell, Spenser Cornett"
+__email__ = 'djoubert@ucsd.edu,jluttrell@ucsd.edu,scornett@ucsd.edu'
 
 from collections import deque
 
@@ -102,15 +102,54 @@ def revise(csp, xi, xj):
 
     return revised
 
+"""
 def select_unassigned_variable(csp):
-    """Selects the next unassigned variable, or None if there is no more unassigned variables
-    (i.e. the assignment is complete).
+    if is_complete(csp): 
+      return None
 
-    This method implements the minimum-remaining-values (MRV) and degree heuristic. That is,
-    the variable with the smallest number of values left in its available domain.  If MRV ties,
-    then it picks the variable that is involved in the largest number of constraints on other
-    unassigned variables.
-    """
+    min_domain = 9999
+    min_list = []
+
+    for var in csp.variables:
+
+      if var.is_assigned():
+        continue
+
+      if len( var.domain ) == min_domain:
+        min_list.append(var)
+      elif len( var.domain ) < min_domain:
+        min_domain = len( var.domain )
+        min_list = [var]
+
+    if len(min_list) == 1:
+      return min_list[0]
+
+    max_count = 0
+    max_var = None
+
+    for var in min_list:
+
+      count = 0
+
+      for const in csp.constraints[var]:
+        count += 1
+
+      for var_other in csp.variables:
+        if var_other.is_assigned() or var_other == var:
+          continue
+        else:
+          for const in csp.constraints[var, var_other]:
+            count += 1
+
+      if count > max_count:
+        max_count = count
+        max_var = var
+
+    return max_var
+"""
+
+### version of select unassigned variable with tie-breaker, that seems to take longer since tie-breaking isn't that important
+def select_unassigned_variable(csp):
     if is_complete(csp):
       return None
 
@@ -127,6 +166,7 @@ def select_unassigned_variable(csp):
         min_var = var
 
     return min_var
+
 
 def is_complete(csp):
     """Returns True when the CSP assignment is complete, i.e. all of the variables in the CSP have values assigned."""  
@@ -165,19 +205,13 @@ def order_domain_values(csp, variable):
     q = Queue.PriorityQueue()
 
     for value in variable.domain:
-      neigh_choices = neighbor_choices(csp, variable) 
-
-      csp.variables.begin_transaction()
-
-      variable.assign(value)
-      
-      neigh_choices_star = neighbor_choices(csp, variable) 
-      q.put( (neigh_choices - neigh_choices_star, value)  )
-
-      csp.variables.rollback()
+      count = 0
+      for const in csp.constraints[variable]:
+        if const.var2.is_assigned() == False and value in const.var2.domain:
+          count += 1
+      q.put(  (count, value  ))
 
     result = []
-
     while not q.empty():
       (priority, value) = q.get()
       result.append(value)
