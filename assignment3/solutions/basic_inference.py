@@ -2,6 +2,7 @@
 __author__ = "Dieter Joubert, Joseph Luttrell, Spenser Cornett"
 __email__ = 'djoubert@ucsd.edu,jluttrell@ucsd.edu,scornett@ucsd.edu'
 
+from collections import deque
 
 def select_unassigned_variable(csp):
     """Selects the next unassigned variable, or None if there is no more unassigned variables
@@ -21,11 +22,8 @@ def order_domain_values(csp, variable):
 
 
 def inference(csp, variable):
-    """Performs an inference procedure for the variable assignment.
-
-    For P3, *you do not need to modify this method.*
-    """
-    return True
+    """Performs an inference procedure for the variable assignment. """
+    return ac3(csp, csp.constraints[variable].arcs())
 
 
 def backtracking_search(csp):
