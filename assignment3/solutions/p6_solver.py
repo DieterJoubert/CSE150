@@ -81,16 +81,17 @@ def revise(csp, xi, xj):
 
     for const in csp.constraints[xi, xj]:
 
-      found = False
-
       for val_i in xi.domain:
+
+        found = False
+
         for val_j in xj.domain:
           if const.is_satisfied(val_i, val_j):
             found = True
 
-      if found == False:
-        to_delete.append(val_i)
-        revised = True
+        if found == False:
+          to_delete.append(val_i)
+          revised = True
 
     import copy
     domain_new = copy.deepcopy(xi.domain)
@@ -218,6 +219,7 @@ def order_domain_values(csp, variable):
 
     return result
 
+
 def neighbor_choices(csp, var):      
     choices = 0
     for value in var.domain:
@@ -231,5 +233,3 @@ def neighbor_choices(csp, var):
               if const.is_satisfied(value, val_other):
                 choices += 1
     return choices
-
-
