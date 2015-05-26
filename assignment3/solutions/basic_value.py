@@ -15,9 +15,41 @@ def select_unassigned_variable(csp):
 def order_domain_values(csp, variable):
     """Returns a list of (ordered) domain values for the given variable.
 
-    For P3, *you do not need to modify this method.*
-    """
-    return [value for value in variable.domain]
+    This method implements the least-constraining-value (LCV) heuristic; that is, the value
+    that rules out the fewest choices for the neighboring variables in the constraint graph
+    are placed before others.
+    """  
+    import Queue
+    q = Queue.PriorityQueue()
+
+    for value in variable.domain:
+      count = 0
+      for const in csp.constraints[variable]:
+        if const.var2.is_assigned() == False and value in const.var2.domain:
+          count += 1
+      q.put(  (count, value  ))
+
+    result = []
+    while not q.empty():
+      (priority, value) = q.get()
+      result.append(value)
+
+    return result
+
+
+def neighbor_choices(csp, var):      
+    choices = 0
+    for value in var.domain:
+      for var_other in csp.variables:
+        if var_other.is_assigned() or var_other == var:
+          continue
+        else:
+          for const in csp.constraints[var, var_other]:
+            for val_other in var_other.domain:
+
+              if const.is_satisfied(value, val_other):
+                choices += 1
+    return choices
 
 
 def inference(csp, variable):

@@ -51,17 +51,20 @@ def backtrack(csp):
     if is_complete(csp):
       return True
 
-    else:
-      var = select_unassigned_variable(csp)
-      for value in order_domain_values(csp, var):
+    var = select_unassigned_variable(csp)
+
+    for value in order_domain_values(csp, var):
+      if is_consistent(csp, var, value):
 
         csp.variables.begin_transaction()
 
-        if is_consistent(csp, var, value):
-          var.assign(value)
+        var.assign(value)
 
-          if backtrack(csp) == True:
-            return True
+        var_inference = inference(csp, var)
+        if var_inference != False:
+          result = backtrack(csp)
+          if result != False:
+            return result
 
         csp.variables.rollback()
 
@@ -92,4 +95,63 @@ def is_consistent(csp, variable, value):
           return False
 
     return True
+
+
+def ac3(csp, arcs=None):
+    """Executes the AC3 or the MAC (p.218 of the textbook) algorithms.
+
+    If the parameter 'arcs' is None, then this method executes AC3 - that is, it will check the arc consistency
+    for all arcs in the CSP.  Otherwise, this method starts with only the arcs present in the 'arcs' parameter
+    in the queue.
+
+    Note that the current domain of each variable can be retrieved by 'variable.domains'.
+
+    This method returns True if the arc consistency check succeeds, and False otherwise.  Note that this method does not
+    return any additional variable assignments (for simplicity)."""
+
+    queue_arcs = deque(arcs if arcs is not None else csp.constraints.arcs())
+
+    while queue_arcs:
+      (Xi, Xj) = queue_arcs.pop()
+      if revise(csp, Xi, Xj):
+        if Xi.domain is None or len(Xi.domain) == 0:
+          return False
+        
+        for (a, b) in csp.constraints[Xi].arcs():
+          if b == Xi or b == Xj:
+            continue
+          else:
+            queue_arcs.append( (b, a) )
+
+    return True
+
+def revise(csp, xi, xj):
+    revised = False
+
+    to_delete = []
+
+    for const in csp.constraints[xi, xj]:
+
+      for val_i in xi.domain:
+
+        found = False
+
+        for val_j in xj.domain:
+          if const.is_satisfied(val_i, val_j):
+            found = True
+
+        if found == False:
+          to_delete.append(val_i)
+          revised = True
+
+    import copy
+    domain_new = copy.deepcopy(xi.domain)
+    for val in to_delete:
+      if val in domain_new:
+        domain_new.remove(val)
+
+    xi.domain = copy.deepcopy(domain_new)
+
+    return revised
+
 

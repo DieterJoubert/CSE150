@@ -121,7 +121,7 @@ def select_unassigned_variable(csp):
         min_domain = len( var.domain )
         min_list = [var]
 
-    if len(min_list) == 1:
+    if len(min_list) == 1 or len(min_list[0].domain) > 3:
       return min_list[0]
 
     max_count = 0

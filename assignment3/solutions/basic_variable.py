@@ -4,13 +4,48 @@ __email__ = 'djoubert@ucsd.edu,jluttrell@ucsd.edu,scornett@ucsd.edu'
 
 
 def select_unassigned_variable(csp):
-    """Selects the next unassigned variable, or None if there is no more unassigned variables
-    (i.e. the assignment is complete).
+    if is_complete(csp): 
+      return None
 
-    For P3, *you do not need to modify this method.*
-    """
-    return next((variable for variable in csp.variables if not variable.is_assigned()))
+    min_domain = 9999
+    min_list = []
 
+    for var in csp.variables:
+
+      if var.is_assigned():
+        continue
+
+      if len( var.domain ) == min_domain:
+        min_list.append(var)
+      elif len( var.domain ) < min_domain:
+        min_domain = len( var.domain )
+        min_list = [var]
+
+    if len(min_list) == 1:
+      return min_list[0]
+
+    max_count = 0
+    max_var = None
+
+    for var in min_list:
+
+      count = 0
+
+      for const in csp.constraints[var]:
+        count += 1
+
+      for var_other in csp.variables:
+        if var_other.is_assigned() or var_other == var:
+          continue
+        else:
+          for const in csp.constraints[var, var_other]:
+            count += 1
+
+      if count > max_count:
+        max_count = count
+        max_var = var
+
+    return max_var
 
 def order_domain_values(csp, variable):
     """Returns a list of (ordered) domain values for the given variable.
