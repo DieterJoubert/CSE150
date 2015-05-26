@@ -103,7 +103,6 @@ def revise(csp, xi, xj):
 
     return revised
 
-"""
 def select_unassigned_variable(csp):
     if is_complete(csp): 
       return None
@@ -147,9 +146,10 @@ def select_unassigned_variable(csp):
         max_var = var
 
     return max_var
-"""
+
 
 ### version of select unassigned variable with tie-breaker, that seems to take longer since tie-breaking isn't that important
+"""
 def select_unassigned_variable(csp):
     if is_complete(csp):
       return None
@@ -167,7 +167,7 @@ def select_unassigned_variable(csp):
         min_var = var
 
     return min_var
-
+"""
 
 def is_complete(csp):
     """Returns True when the CSP assignment is complete, i.e. all of the variables in the CSP have values assigned."""  
