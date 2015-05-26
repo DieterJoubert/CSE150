@@ -104,6 +104,9 @@ def revise(csp, xi, xj):
     return revised
 
 def select_unassigned_variable(csp):
+    """Selects the next unassigned variable, or None if there is no more unassigned variables
+    (i.e. the assignment is complete).
+    """
     if is_complete(csp): 
       return None
 
@@ -121,7 +124,7 @@ def select_unassigned_variable(csp):
         min_domain = len( var.domain )
         min_list = [var]
 
-    if len(min_list) == 1 or len(min_list[0].domain) > 3:
+    if len(min_list) == 1:
       return min_list[0]
 
     max_count = 0
@@ -146,28 +149,6 @@ def select_unassigned_variable(csp):
         max_var = var
 
     return max_var
-
-
-### version of select unassigned variable with tie-breaker, that seems to take longer since tie-breaking isn't that important
-"""
-def select_unassigned_variable(csp):
-    if is_complete(csp):
-      return None
-
-    min_domain = 99999999999
-    min_var = None
-
-    for var in csp.variables:
-
-      if var.is_assigned():
-        continue
-
-      if len( var.domain ) < min_domain:
-        min_domain = len( var.domain )
-        min_var = var
-
-    return min_var
-"""
 
 def is_complete(csp):
     """Returns True when the CSP assignment is complete, i.e. all of the variables in the CSP have values assigned."""  
