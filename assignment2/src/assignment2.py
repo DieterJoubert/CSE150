@@ -11,14 +11,15 @@ __email__ = 'ttsuchida@ucsd.edu'
 class Player(object):
     """The base class for all agents."""
 
-    def __init__(self, color, next=None):
+    def _set_color(self, color):
+        """sets the color of this player."""
         self.color = color
-        self.next = next
+        return self
 
     @staticmethod
     def create_players(player_classes):
         """Instantiates Player objects from the given list of Player subclasses."""
-        players = [player_class(i + 1) for i, player_class in enumerate(player_classes)]
+        players = [player_class()._set_color(i + 1) for i, player_class in enumerate(player_classes)]
         for i, player in enumerate(players):
             player.next = players[(i + 1) % len(players)]
         return players
@@ -38,6 +39,10 @@ class Player(object):
     def __str__(self):
         return "%s (%d)" % (self.name, self.color)
 
+    def _do_move(self, state, result_q, signal_q):
+        """Internal method. Do not modify."""
+        pass
+
     @property
     def name(self):
         return self.__class__.__name__
@@ -56,7 +61,7 @@ class Player(object):
         Returns:
             the next move (Action)
         """
-        raise NotImplemented
+        raise NotImplementedError('Please implement the move() method')
 
 
 class Action(object):

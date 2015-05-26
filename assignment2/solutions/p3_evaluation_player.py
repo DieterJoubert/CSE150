@@ -1,10 +1,15 @@
 # -*- coding: utf-8 -*-
-__author__ = 'Sivasubramanian Chandrasegarampillai, Walter Curnow'
-__email__ = 'rchandra@uci.edu,wcurnow@uci.edu'
+__author__ = "Dieter Joubert, Joseph Luttrell, Spenser Cornett"
+__email__ = 'djoubert@ucsd.edu,jluttrell@ucsd.edu,scornett@ucsd.edu'
 
 import heapq
 
 from assignment2 import Player
+
+test1 =  [[0,2,1,0],[0,1,2,0],[0,0,0,0],[0,0,0,0]]
+test2 = [[0,0,0,0,0,0],[0,0,0,0,1,0],[0,0,0,1,0,0],[0,0,1,0,1,0],[0,1,0,0,1,0],[0,0,0,0,1,0],[0,0,0,0,2,0]]
+test3 = [[0,1,0,0,0],[1,0,1,0,0],[0,0,0,1,0]]
+test4 = [[1,0,0,0],[0,1,0,1],[1,0,1,0],[0,1,0,0],[1,0,1,0],[0,0,0,1],[0,0,0,0]]
 
 
 class EvaluationPlayer(Player):
@@ -52,4 +57,117 @@ class EvaluationPlayer(Player):
         """
 
         # TODO implement this
-        return 0.0
+
+        ### Comment out for direct testing ###
+        board = state.board
+        height = state.M
+        width = state.N
+        #######################################
+
+        ### For direct testing ###
+        #board = state
+        #width = len(board[0])
+        #height = len(board)
+        ###########################
+
+        val = 0
+
+        #horizontal
+        for row in range(height):
+            temp = 0
+            for col in range(width):
+                if board[row][col] == color:
+                    temp += 1 
+                else:
+                    val = max(temp, val)
+                    temp = 0
+
+            val = max(temp, val)
+
+        #vertical
+        for col in range(width):
+            temp = 0
+            for row in range(height):
+                if board[row][col] == color:
+                    temp += 1
+                else:
+                    val = max(temp, val)
+                    temp = 0
+                    
+            val = max(temp, val)
+
+
+        #diagonals running top left to bottom right, starting at horizontal top
+        for col in range(0,width):
+            temp = 0
+            x = col
+            y = 0
+            while( 0 <= x < width and 0 <= y < height ):
+                if board[y][x] == color:
+                    temp = temp + 1 
+                else:
+                    val = max(temp, val)
+                    temp = 0
+                x += 1
+                y += 1
+            val = max(temp, val)
+
+        #diagonals running top left to bottom right, starting at vertical left
+        for row in range(0,height):
+            temp = 0
+            x = 0
+            y = row
+            while( 0 <= x < width and 0 <= y < height ):
+                if board[y][x] == color:
+                    temp = temp + 1 
+                else:
+                    val = max(temp, val)
+                    temp = 0
+                x += 1
+                y += 1
+            val = max(temp, val)
+
+
+        #diagonals running top right to bottom left, start at horizontal top
+        for col in range(0,width):
+            temp = 0
+            x = col
+            y = 0
+            while( 0 <= x < width and 0 <= y < height ):
+                if board[y][x] == color:
+                    temp = temp + 1 
+                else:
+                    val = max(temp, val)
+                    temp = 0
+                x -= 1
+                y += 1
+            val = max(temp, val)
+
+        #diagonals running top right to bottom left, starting at vertical right
+        for row in range(0,height):
+            temp = 0
+            x = width-1
+            y = row
+            while( 0 <= x < width and 0 <= y < height ):
+                if board[y][x] == color:
+                    temp = temp + 1 
+                else:
+                    val = max(temp, val)
+                    temp = 0
+                x -= 1
+                y += 1
+            val = max(temp, val)
+
+        return float(val) / float(state.K)
+
+
+
+
+### For Direct Testing ###
+#player1 = EvaluationPlayer(1)
+
+#print player1.evaluate(test1, 1)
+#print player1.evaluate(test2, 1)
+#player1.evaluate(test3, 1)
+#player1.evaluate(test4, 1)
+##############################

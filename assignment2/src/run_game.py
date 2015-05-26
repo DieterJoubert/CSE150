@@ -4,9 +4,10 @@
 __author__ = 'Tomoki Tsuchida'
 __email__ = 'ttsuchida@ucsd.edu'
 
-import sys, os
+import os
 from types import MethodType
 from multiprocessing import Process, Queue
+
 try:
     from queue import Empty
 except ImportError:
@@ -27,6 +28,7 @@ class Game(object):
             next_move = self.request_move()
             self.state = self.state.result(next_move)
             self.after_move()
+        return self.state.winner_color
 
     def request_move(self):
         # state = copy.deepcopy(self.state)
@@ -43,29 +45,36 @@ class Game(object):
 
             # Dynamically augment the player instance
             def is_time_up(self):
-                try:
-                    self._signal_q.get_nowait()
-                    return True
-                except Empty:
-                    return False
+                if not self._timeup:
+                    try:
+                        self._signal_q.get_nowait()
+                        self._timeup = True
+                    except Empty:
+                        return False
+                return True
 
-            def do_move(self, state, result_q, signal_q):
+            def _do_move(self, state, result_q, signal_q):
                 sys.stdin = os.fdopen(self.fileno)
                 self._signal_q = signal_q
-                result_q.put_nowait(self.move(state))
+                action = self.move(state)
+                members = [(attr, v) for attr, v in vars(self).items() \
+                           if not callable(getattr(self, attr)) and not attr.startswith("__") \
+                           and not attr in ['_signal_q', '_timeup', 'fileno', 'next', 'color']]
+                result_q.put_nowait((action, members))
 
             player.is_time_up = MethodType(is_time_up, player)
-            player.do_move = MethodType(do_move, player)
+            player._do_move = MethodType(_do_move, player)
             player.fileno = sys.stdin.fileno()
-
+            player._timeup = False
 
             # Boot a process for the player move
-            move_process = Process(target=player.do_move, args=(state, self.result_q, self.signal_q))
+            move_process = Process(target=player._do_move, args=(state, self.result_q, self.signal_q))
             move_process.start()
 
             action = None
+            player_vars = None
             try:
-                action = self.result_q.get(True, self.timeout)
+                action, player_vars = self.result_q.get(True, self.timeout)
 
             except Empty:
                 # Send the "time is up" warning
@@ -73,7 +82,7 @@ class Game(object):
 
                 # Wait one second and get the move
                 try:
-                    action = self.result_q.get(True, 1)
+                    action, player_vars = self.result_q.get(True, 1)
                 except Empty:
                     pass
 
@@ -93,8 +102,13 @@ class Game(object):
                 move_process.join(1)
 
             if action is None:
+                print("Time is up and no valid move was returned, playing a random move.")
                 # If a move wasn't placed on the result pipe in time, play a random move
                 action = self.state.actions()[0]
+
+            if player_vars is not None:
+                for key, value in player_vars:
+                    setattr(player, key, value)
 
         return action
 
@@ -108,15 +122,17 @@ class ConsoleGame(Game):
         print(self.state.last_action)
 
     def play(self):
-        super(ConsoleGame, self).play()
+        winner_color = super(ConsoleGame, self).play()
 
         print(self.state)
 
-        if self.state.winner_color == 0:
+        if winner_color == 0:
             print("Draw!")
+            return None
         else:
-            winner = next((player for player in self.players if player.color == self.state.winner_color))
+            winner = next((player for player in self.players if player.color == winner_color))
             print("%s won!" % str(winner))
+            return winner
 
 
 if __name__ == '__main__':
@@ -146,7 +162,8 @@ if __name__ == '__main__':
 
     modules = [__import__(op.splitext(op.basename(f))[0]) for f in player_files]
     names = dict([(name, module) for module in modules for name in dir(module) if
-                  inspect.isclass(getattr(module, name)) and issubclass(getattr(module, name), Player)])
+                  inspect.isclass(getattr(module, name)) and issubclass(getattr(module, name), Player) and \
+                  getattr(module, name) != Player])
     player_classes = [getattr(names[name], name) for name in player_names]
 
     game = ConsoleGame(M, N, K, player_classes, timeout)
