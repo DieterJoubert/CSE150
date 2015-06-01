@@ -654,6 +654,7 @@ class EvalAgentTest(testClasses.TestCase):
 
     def execute(self, grades, moduleDict, solutionDict):
         self.addMessage('Grading agent using command:  python pacman.py %s'% (self.pacmanParams,))
+        pacman.TEST_MODULE = moduleDict
 
         startTime = time.time()
         games = pacman.runGames(** pacman.readCommand(self.pacmanParams.split(' ')))

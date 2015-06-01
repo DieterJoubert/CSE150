@@ -39,14 +39,17 @@ code to run a game.  This file is divided into three sections:
 To play your first game, type 'python pacman.py' from the command line.
 The keys are 'a', 's', 'd', and 'w' to move (or arrow keys).  Have fun!
 """
+import random
+import os
+
 from game import GameStateData
 from game import Game
 from game import Directions
 from game import Actions
 from util import nearestPoint
 from util import manhattanDistance
-import util, layout
-import sys, types, time, random, os
+import layout
+
 
 ###################################################
 # YOUR INTERFACE TO THE PACMAN WORLD: A GameState #
@@ -584,6 +587,8 @@ def readCommand( argv ):
 
     return args
 
+TEST_MODULE = None
+
 def loadAgent(pacman, nographics):
     # Looks through all pythonPath Directories for the right module,
     pythonPathStr = os.path.expandvars("$PYTHONPATH")
@@ -592,7 +597,13 @@ def loadAgent(pacman, nographics):
     else:
         pythonPathDirs = pythonPathStr.split(';')
     pythonPathDirs.append('.')
+    pythonPathDirs.append('../src/')
     pythonPathDirs.append('../solutions/')
+
+    if TEST_MODULE is not None:
+        for module in TEST_MODULE.values():
+            if pacman in dir(module):
+                return getattr(module, pacman)
 
     for moduleDir in pythonPathDirs:
         if not os.path.isdir(moduleDir): continue
