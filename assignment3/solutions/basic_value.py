@@ -36,7 +36,6 @@ def order_domain_values(csp, variable):
 
     return result
 
-
 def neighbor_choices(csp, var):      
     choices = 0
     for value in var.domain:

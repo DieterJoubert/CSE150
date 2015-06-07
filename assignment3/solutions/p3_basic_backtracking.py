@@ -48,6 +48,7 @@ def backtrack(csp):
     If there is a solution, this method returns True; otherwise, it returns False.
     """
 
+    #if all variables assigned, must have passed inconsistency check, found solution
     if is_complete(csp):
       return True
 
@@ -55,6 +56,7 @@ def backtrack(csp):
       var = select_unassigned_variable(csp)
       for value in order_domain_values(csp, var):
 
+        #going to check new value, save current CSP
         csp.variables.begin_transaction()
 
         if is_consistent(csp, var, value):
@@ -63,6 +65,7 @@ def backtrack(csp):
           if backtrack(csp) == True:
             return True
 
+        #if no value found, rollback to CSP, try next value
         csp.variables.rollback()
 
     return False
@@ -83,13 +86,14 @@ def is_consistent(csp, variable, value):
     in csp.constraints), and the current assignment as Y=y, we want to check if the value x we want to assign to X
     violates the constraint c(x,y).  This method does not check c(x,Z), because Z is not yet assigned."""  
     for const in csp.constraints[variable]:
-
       var_neighbor = const.var2
       if var_neighbor.is_assigned() == False:
         continue
       else:
+        #check if a constraint is violated anywhere, if so, return False
         if not const.is_satisfied(value, var_neighbor.value):
           return False
 
+    #no constraints broken, return True
     return True
 

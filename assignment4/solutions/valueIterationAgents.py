@@ -1,3 +1,6 @@
+__author__ = "Dieter Joubert, Joseph Luttrell, Spenser Cornett"
+__email__ = 'djoubert@ucsd.edu,jluttrell@ucsd.edu,scornett@ucsd.edu'
+
 # valueIterationAgents.py
 # -----------------------
 # Licensing Information:  You are free to use or extend these projects for
@@ -45,24 +48,23 @@ class ValueIterationAgent(ValueEstimationAgent):
 
         # Write value iteration code here
         "*** YOUR CODE HERE ***"
-        for i in range(iterations):
+        for i in range(self.iterations):
 
-          tempvalues = self.values.copy()
-          for s in self.mdp.getStates():
-            maxvalue = None
-            for a in self.mdp.getPossibleActions(s):
-              temp = 0 
-              for (nextState, P) in self.mdp.getTransitionStatesAndProbs(s,a):
-                reward = self.mdp.getReward(s, a, nextState)
-                value = tempvalues[nextState]
-                temp += P * (reward + self.discount * value)
+          temp_values = util.Counter()
+          for state in self.mdp.getStates():
 
-              maxvalue = max(temp, maxvalue)
+            best_found = float(-9999999999999999)
+            
+            for action in self.mdp.getPossibleActions(state):
+              summation = 0
+              for (next_state, prob) in self.mdp.getTransitionStatesAndProbs(state,action):
 
-            if self.mdp.isTerminal(s):
-              self.values[s] = 0
-            else:
-              self.values[s] = maxvalue
+                summation += prob * ((self.mdp.getReward(state,action,next_state) + self.discount * self.getValue(next_state)))
+
+              best_found = max(best_found, summation)
+              temp_values[state] = best_found
+
+          self.values = temp_values
 
     def getValue(self, state):
         """
@@ -77,13 +79,11 @@ class ValueIterationAgent(ValueEstimationAgent):
           value function stored in self.values.
         """
         "*** YOUR CODE HERE ***"
-        Q = 0
-        for (nextState, P) in self.mdp.getTransitionStatesAndProbs(state, action):
-          reward = self.mdp.getReward(state,action,nextState)
-          value = self.values[nextState]
-          Q += P * (reward + self.discount * value)
-        return Q
-        util.raiseNotDefined()
+        Q_value = 0
+        for (next_state, prob) in self.mdp.getTransitionStatesAndProbs(state,action):
+          Q_value += prob * (self.mdp.getReward(state, action, next_state) + self.discount * self.getValue(next_state))
+        
+        return Q_value
 
     def computeActionFromValues(self, state):
         """
@@ -95,15 +95,15 @@ class ValueIterationAgent(ValueEstimationAgent):
           terminal state, you should return None.
         """
         "*** YOUR CODE HERE ***"
-        possible_actions = self.mdp.getPossibleActions(state)
-        if len(possible_actions) == 0:
-          return None
-        else:
-          maximum = None
-          for action in possible_actions:
-            maximum = max(maximum, self.getQValue(state,action))
-          return maximum
-        util.raiseNotDefined()
+        best_found = None
+        best_value = float(-999999999)
+
+        for action in self.mdp.getPossibleActions(state):
+          if self.computeQValueFromValues(state,action) > best_value:
+            best_found = action
+            best_value = self.computeQValueFromValues(state, action)
+
+        return best_found
 
     def getPolicy(self, state):
         return self.computeActionFromValues(state)

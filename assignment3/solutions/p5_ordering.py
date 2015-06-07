@@ -21,35 +21,38 @@ def select_unassigned_variable(csp):
 
     for var in csp.variables:
 
+      #if already assigned, pass over it
       if var.is_assigned():
         continue
 
+      #if just as long as shortest we've found, add to our list of shortest
       if len( var.domain ) == min_domain:
         min_list.append(var)
+      #if shorter than shortest found, create new list with just this new one, save min domain
       elif len( var.domain ) < min_domain:
         min_domain = len( var.domain )
         min_list = [var]
 
+    #if only one variable in final list, return it, otherwise tie-break
     if len(min_list) == 1:
       return min_list[0]
 
     max_count = 0
     max_var = None
 
+    #tie-break between list of variables with all the same min domain size
     for var in min_list:
 
       count = 0
 
+      #check how many constraints on unassigned variables this var is involved with
       for const in csp.constraints[var]:
-        count += 1
-
-      for var_other in csp.variables:
-        if var_other.is_assigned() or var_other == var:
+        if const.var2.is_assigned():
           continue
         else:
-          for const in csp.constraints[var, var_other]:
-            count += 1
+          count += 1
 
+      #check if variable is found that is involved in more constraints than best so far
       if count > max_count:
         max_count = count
         max_var = var
@@ -63,48 +66,35 @@ def order_domain_values(csp, variable):
     This method implements the least-constraining-value (LCV) heuristic; that is, the value
     that rules out the fewest choices for the neighboring variables in the constraint graph
     are placed before others.
-    """
-
+    """  
+    #keep queue of values with priority being the LCV
     import Queue
     q = Queue.PriorityQueue()
 
     for value in variable.domain:
-      neigh_choices = neighbor_choices(csp, variable) 
+      count = 0
 
-      csp.variables.begin_transaction()
+      for const in csp.constraints[variable]:
 
-      variable.assign(value)
-      neigh_choices_star = neighbor_choices(csp, variable) 
-      q.put( (neigh_choices - neigh_choices_star, value)  )
+        #if other value in constraint is not assigned
+        if const.var2.is_assigned() == False:
 
-      csp.variables.rollback()
+          for val2 in const.var2.domain:
+            if const.is_satisfied(value, val2):
+              continue
+            else:
+              #if not satisfied, rules out a value, count++
+              count += 1
+
+      q.put( (count, value) )
 
     result = []
-
+    #depopulate queue into result to return list ordered by LCV
     while not q.empty():
       (priority, value) = q.get()
       result.append(value)
 
     return result
-
-
-def neighbor_choices(csp, var):      
-  choices = 0
-  for value in var.domain:
-    for var_other in csp.variables:
-      if var_other.is_assigned() or var_other == var:
-        continue
-      else:
-        for const in csp.constraints[var, var_other]:
-          for val_other in var_other.domain:
-
-            if const.is_satisfied(value, val_other):
-              choices += 1
-
-  return choices
-
-
-##HELPERS
 
 def is_complete(csp):
   """Returns True when the CSP assignment is complete, i.e. all of the variables in the CSP have values assigned."""  
